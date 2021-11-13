@@ -1,5 +1,4 @@
 import { BigInt } from '@graphprotocol/graph-ts';
-import { log } from '@graphprotocol/graph-ts';
 import {
   BSC_Stream,
   CancelStream,
@@ -11,7 +10,6 @@ import { Stream } from '../generated/schema';
 export function handleCancelStream(event: CancelStream): void {
   let stream = Stream.load(event.params.streamId.toString());
   if (stream) {
-    log.info('Cancelled Stream ID: ', [stream.streamId.toString()]);
     stream.status = 'cancelled';
     stream.amount = event.params.recipientBalance;
     stream.save();
@@ -35,7 +33,6 @@ export function handleCreateStream(event: CreateStream): void {
   stream.status = 'active';
   stream.amount = new BigInt(0);
   stream.save();
-  log.info('Created Stream ID: ', [stream.streamId.toString()]);
 }
 
 export function handleWithdrawFromStream(event: WithdrawFromStream): void {
@@ -44,7 +41,6 @@ export function handleWithdrawFromStream(event: WithdrawFromStream): void {
     let sablier = BSC_Stream.bind(event.address);
     let result = sablier.try_getStream(event.params.streamId);
     if (result.reverted) {
-      log.info('Withdraw Stream ID: ', [stream.streamId.toString()]);
       stream.status = 'withdrawn';
       stream.amount = event.params.amount.plus(stream.amount);
       stream.save();
